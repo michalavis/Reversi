@@ -48,7 +48,7 @@ public class Simulator {
 	public void TryToMakeBestMove(Map<BoardMatrix, Optional<Player>> boardStatus) {
 		Map<BoardMatrix, Optional<Player>> possiblePlayerMoves = analyzer
 				.getAllPossiblePlayerMoves(boardStatus);
-		possiblePlayerMoves.entrySet().parallelStream()
+		possiblePlayerMoves.entrySet().stream()
 				.forEach(possibleMoves -> simulateBestMove(possibleMoves, boardStatus));
 	}
 
