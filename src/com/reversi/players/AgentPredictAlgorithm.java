@@ -60,17 +60,20 @@ public class AgentPredictAlgorithm implements Agent {
 		Map<BoardMatrix, Optional<Player>> copyBoardStatus = Maps.newHashMap();
 		copyBoardStatus.putAll(gameBoard.getBoardStatus());
 		simulator.TryToMakeBestMove(copyBoardStatus);
-		Entry<ValueCellCoordinates, Integer> highestValueResult = boardCellsValueForAgent.entrySet().stream()
-				.max(Map.Entry.comparingByValue())
-				.get();
-		Entry<ValueCellCoordinates, Integer> moveToAdd = getCellToAdd(highestValueResult);
-		gamePlay.setPlayerToAdd(moveToAdd.getKey().getCoordinate(), Player.builder()
-				.withGridSize(gameBoard.getGridSize())
-				.withColor(gamePlay.getPlayer().getColor()).build());
+			
+		synchronized (gameBoard) {
+			Entry<ValueCellCoordinates, Integer> highestValueResult = getBoardCellsValueForAgent().entrySet().stream()
+					.max(Map.Entry.comparingByValue())
+					.get();
+			Entry<ValueCellCoordinates, Integer> moveToAdd = getCellToAdd(highestValueResult);
+			gamePlay.setPlayerToAdd(moveToAdd.getKey().getCoordinate(), Player.builder()
+					.withGridSize(gameBoard.getGridSize())
+					.withColor(gamePlay.getPlayer().getColor()).build());
+		}
 	}
 	
 	private Entry<ValueCellCoordinates, Integer> getCellToAdd(Entry<ValueCellCoordinates, Integer> valueResult) {
-		Optional<Entry<ValueCellCoordinates, Integer>> parent = boardCellsValueForAgent.entrySet().stream()
+		Optional<Entry<ValueCellCoordinates, Integer>> parent = getBoardCellsValueForAgent().entrySet().stream()
 				.filter(entry -> isParent(entry, valueResult))
 				.findFirst();
 		return parent.map(presentParent -> getCellToAdd(presentParent))

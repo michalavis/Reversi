@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
 import com.google.common.collect.Lists;
@@ -14,14 +15,14 @@ import com.reversi.board.GameBoard;
 public class Simulator {
 	
 	private int[][] cellsValue = {
-            {24,  -14,  6,  6,  6,  6,  -14, 24},
+            {99,  -14,  6,  6,  6,  6,  -14, 99},
             {-14, -24, -4, -3, -3, -4, -24, -14},
             { 6,  -4,  7,  4,  4,  7,  -4,  6},
             { 6,  -3,  4,  0,  0,  4,  -3,  6},
             { 6,  -3,  4,  0,  0,  4,  -3,  6},
             { 6,  -4,  7,  4,  4,  7,  -4,  6},
             {-14, -24, -4, -3, -3, -4, -24, -14},
-            {24,  -14,  6,  6,  6,  6,  -14, 24}
+            {99,  -14,  6,  6,  6,  6,  -14, 99}
     };
 
 	private GameBoard gameBoard;
@@ -72,22 +73,6 @@ public class Simulator {
 		return parent.map(presentParent -> agent.getBoardCellsValueForAgent().get(presentParent)).orElse(0);
 	}
 
-	private boolean isDeepEnough() {
-		Optional<UUID> parent = Optional.ofNullable(actualParent);
-		Optional<ValueCellCoordinates> parentCellValueCoordinate = parent
-				.map(presentParent -> getNextParent(presentParent))
-				.orElse(Optional.empty());
-		Optional<UUID> rootParent = parentCellValueCoordinate.map(cell -> Optional.ofNullable(cell.getParentId()))
-				.orElse(Optional.empty());
-		return agent.getPlayerTurn().equals(agent.getAgentColor()) || !rootParent.isPresent();
-	}
-
-	private Optional<ValueCellCoordinates> getNextParent(UUID presentParent) {
-		return agent.getBoardCellsValueForAgent().keySet().stream()
-				.filter(key -> key.getId().equals(presentParent))
-				.findFirst();
-	}
-
 	public void fillBoardAndmakeNextMove(ValueCellCoordinates analyzedCell,
 			Map<BoardMatrix, Optional<Player>> copyBoardStatus) {
 		BoardMatrix cellCoordinate = analyzedCell.getCoordinate();
@@ -98,9 +83,7 @@ public class Simulator {
 		analyzer.getPlayersToConvert().entrySet().stream().forEach(this::convert);
 		analyzer.getSpecificCell(cellCoordinate)
 				.ifPresent(cell -> cell.setValue(Optional.of(agent.getPlayerTurn())));
-		if (isDeepEnough()) {
-			makeNextMove(analyzedCell);
-		}
+		CompletableFuture.runAsync(() -> makeNextMove(analyzedCell));
 	}
 
 	private void findCellsToConvert(BoardMatrix neighbourPosition, BoardMatrix cellPosition) {
