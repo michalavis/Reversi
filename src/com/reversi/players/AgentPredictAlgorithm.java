@@ -39,7 +39,7 @@ public class AgentPredictAlgorithm implements Agent {
 
 	@Override
 	public void changeSimulationPlayer() {
-		if (playerTurn.getColor().equals(Color.BLACK)) {
+		if (getPlayerTurn().getColor().equals(Color.BLACK)) {
 			playerTurn = Player.builder().withGridSize(gameBoard.getGridSize()).withColor(Color.WHITE).build();
 		} else {
 			playerTurn = Player.builder().withGridSize(gameBoard.getGridSize()).withColor(Color.BLACK).build();

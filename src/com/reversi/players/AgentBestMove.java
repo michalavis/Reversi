@@ -62,7 +62,7 @@ public class AgentBestMove implements Agent {
 	public Map<BoardMatrix, Optional<Player>> getAllPossiblePlayerMoves() {
 		Map<BoardMatrix, Optional<Player>> freeRivalNeighbours = Maps.newHashMap();
 		getPlayerRival().entrySet().stream()
-		.forEach(cell -> findFreeRivalNeighbours(cell, freeRivalNeighbours));
+				.forEach(cell -> findFreeRivalNeighbours(cell, freeRivalNeighbours));
 		return freeRivalNeighbours.entrySet().stream()
 				.filter(this::getAllPossibleMoves)
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue));
@@ -89,7 +89,7 @@ public class AgentBestMove implements Agent {
 				.forEach(freeCell -> getAllFreeCells(freeCell, freePlayerNeighbours));
 	}
 	
-	private Predicate<? super Entry<BoardMatrix, Optional<Player>>> isPlayerNotPresent() {
+	private Predicate<Entry<BoardMatrix, Optional<Player>>> isPlayerNotPresent() {
 		return entry -> !entry.getValue().isPresent();
 	}
 	
@@ -172,5 +172,4 @@ public class AgentBestMove implements Agent {
 	public void estimateNextMove(ValueCellCoordinates cellValueCoordinate,
 			Map<BoardMatrix, Optional<Player>> simulatedBoardStatus) {
 	}
-
 }
